@@ -1,0 +1,20 @@
+<script type="module">
+  import { fetchSensorData } from '../assets/js/api.js';
+
+  async function updateSensorData() {
+    const data = await fetchSensorData();
+    if (data) {
+      document.getElementById('temperature').textContent = data.temperature + ' °C';
+      document.getElementById('humidity').textContent = data.humidity + ' %';
+      document.getElementById('soilMoisture').textContent = data.soilMoisture + ' %';
+      document.getElementById('ph').textContent = data.ph;
+      document.getElementById('ec').textContent = data.ec;
+    }
+  }
+
+  // Mettre à jour les données toutes les 2 secondes
+  setInterval(updateSensorData, 2000);
+
+  // Mettre à jour les données dès le chargement de la page
+  window.onload = updateSensorData;
+</script>

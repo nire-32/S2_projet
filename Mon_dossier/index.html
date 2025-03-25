@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jardin Intelligent - Tableau de Bord</title>
+    <link rel="stylesheet" href="assets/css/esp32-web-assets.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <h2>Jardin<span>Intelligent</span></h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a></li>
+                <li><a href="#"><i class="fas fa-chart-line"></i> Statistiques</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Paramètres</a></li>
+                <li><a href="#"><i class="fas fa-bell"></i> Alertes</a></li>
+                <li><a href="#"><i class="fas fa-users"></i> Utilisateurs</a></li>
+            </ul>
+            <div class="user-info">
+                <img src="https://via.placeholder.com/50" alt="Photo de profil">
+                <div>
+                    <h4>Utilisateur</h4>
+                    <p>Admin</p>
+                </div>
+            </div>
+        </nav>
+
+        <main class="content">
+            <header>
+                <div class="header-content">
+                    <h1>Tableau de Bord</h1>
+                    <div class="user-controls">
+                        <button><i class="fas fa-bell"></i></button>
+                        <button><i class="fas fa-user"></i></button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard">
+                <div class="overview-cards">
+                    <div class="card">
+                        <div class="card-info">
+                            <h3>Température</h3>
+                            <p id="temperature">-- °C</p>
+                        </div>
+                        <div class="card-icon">
+                            <i class="fas fa-temperature-high"></i>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-info">
+                            <h3>Humidité Air</h3>
+                            <p id="humidity">-- %</p>
+                        </div>
+                        <div class="card-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-info">
+                            <h3>Humidité Sol</h3>
+                            <p id="soilMoisture">-- %</p>
+                        </div>
+                        <div class="card-icon">
+                            <i class="fas fa-water"></i>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-info">
+                            <h3>Luminosité</h3>
+                            <p id="lightLevel">-- lux</p>
+                        </div>
+                        <div class="card-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-row">
+                    <div class="chart-container">
+                        <h3>Évolution de la Température et de l'Humidité</h3>
+                        <canvas id="tempHumChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>État du Sol</h3>
+                        <canvas id="soilChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <div class="parameter-card">
+                        <h3>pH du Sol</h3>
+                        <div class="gauge-container">
+                            <div class="gauge" id="phGauge">
+                                <div class="gauge-value" id="phValue">--</div>
+                            </div>
+                            <div class="gauge-scale">
+                                <span>0</span>
+                                <span>7</span>
+                                <span>14</span>
+                            </div>
+                        </div>
+                        <div class="status" id="phStatus">État: Normal</div>
+                    </div>
+
+                    <div class="parameter-card">
+                        <h3>Conductivité Électrique</h3>
+                        <div class="gauge-container">
+                            <div class="gauge" id="ecGauge">
+                                <div class="gauge-value" id="ecValue">--</div>
+                            </div>
+                            <div class="gauge-scale">
+                                <span>0</span>
+                                <span>2500</span>
+                                <span>5000</span>
+                            </div>
+                        </div>
+                        <div class="status" id="ecStatus">État: Normal</div>
+                    </div>
+                </div>
+
+                <div class="history-table">
+                    <h3>Historique des Relevés</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Température</th>
+                                <th>Humidité Air</th>
+                                <th>Humidité Sol</th>
+                                <th>Luminosité</th>
+                                <th>pH</th>
+                                <th>EC</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <!-- Les données seront ajoutées dynamiquement ici -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/sensors.js"></script>
+</body>
+</html>

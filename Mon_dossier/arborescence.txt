@@ -1,0 +1,21 @@
+📁 Projet/
+├── 📁 assets/
+│   ├── 📁 css/
+│   │   └── main.css            → Styles globaux (coller le CSS de `main.css`)
+│   │
+│   ├── 📁 js/
+│   │   ├── api.js              → Appels à l'API ESP32 (code `fetchSensorData`)
+│   │   └── charts.js           → Config des graphiques (code `createTemperatureChart`)
+│   │
+│   └── 📁 libs/                → Bibliothèques externes (Chart.js, etc.)
+│
+├── 📁 components/
+│   ├── Navbar.js               → Code HTML/JS de la barre de navigation (`renderNavbar`)
+│   ├── SensorCard.js           → Template des cartes de capteurs (`createSensorCard`)
+│   ├── LoginForm.js            → Formulaire de connexion (`renderLoginForm`)
+│   └── AlertManager.js         → Système d'alertes (`showAlert`)
+│
+├── index.html                  → Page d'accueil (importe les components et assets)
+├── dashboard.html              → Tableau de bord principal (graphiques)
+└── 📁 esp32/                   → Code Arduino (à part si nécessaire)
+     └── esp32_code.ino         → Code du microcontrôleur avec l'API
