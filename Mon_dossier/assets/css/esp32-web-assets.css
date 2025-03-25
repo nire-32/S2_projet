@@ -1,0 +1,264 @@
+/* assets/css/main.css */
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #2196F3;
+  --danger-color: #f44336;
+  --warning-color: #ff9800;
+  --success-color: #8bc34a;
+  --text-color: #333;
+  --background-color: #f5f5f5;
+  --card-background: #ffffff;
+  --border-radius: 8px;
+  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.card {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+/* assets/css/dashboard.css */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.widget {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.widget-title {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.widget-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 10px 0;
+}
+
+.widget-footer {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.chart-container {
+  height: 200px;
+  width: 100%;
+}
+
+/* assets/js/main.js */
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialiser la connexion WebSocket
+  const socket = new WebSocket(`ws://${window.location.hostname}/ws`);
+  
+  // Gestionnaire d'événements WebSocket
+  socket.onopen = function(e) {
+    console.log('Connexion WebSocket établie');
+  };
+  
+  socket.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    updateSensorDisplays(data);
+    updateCharts(data);
+  };
+  
+  socket.onclose = function(event) {
+    if (event.wasClean) {
+      console.log(`Connexion fermée proprement, code=${event.code} raison=${event.reason}`);
+    } else {
+      console.log('Connexion interrompue');
+      // Tentative de reconnexion après 5 secondes
+      setTimeout(function() {
+        location.reload();
+      }, 5000);
+    }
+  };
+  
+  socket.onerror = function(error) {
+    console.log(`Erreur WebSocket: ${error.message}`);
+  };
+  
+  // Initialiser les widgets et les graphiques
+  initializeDashboard();
+});
+
+// assets/js/sensors.js
+function fetchSensorData() {
+  return fetch('/api/sensors')
+    .then(response => response.json())
+    .catch(error => console.error('Erreur lors de la récupération des données:', error));
+}
+
+function updateSensorDisplays(data) {
+  // Mettre à jour les affichages des capteurs avec les nouvelles données
+  document.getElementById('temperature-value').textContent = `${data.temperature.toFixed(1)}°C`;
+  document.getElementById('humidity-value').textContent = `${data.humidity.toFixed(1)}%`;
+  document.getElementById('soil-moisture-value').textContent = `${data.soilMoisture.toFixed(1)}%`;
+  document.getElementById('light-value').textContent = `${data.light.toFixed(0)} lux`;
+  document.getElementById('ph-value').textContent = `${data.ph.toFixed(2)}`;
+  document.getElementById('ec-value').textContent = `${data.ec.toFixed(2)} μS/cm`;
+  
+  // Mettre à jour les tendances
+  updateTrends(data);
+}
+
+// assets/js/charts.js
+let temperatureChart, humidityChart, soilMoistureChart, lightChart, phChart, ecChart;
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: {
+    duration: 1000
+  },
+  scales: {
+    y: {
+      beginAtZero: false
+    },
+    x: {
+      type: 'time',
+      time: {
+        unit: 'minute',
+        displayFormats: {
+          minute: 'HH:mm'
+        }
+      }
+    }
+  }
+};
+
+function initializeCharts() {
+  const ctx1 = document.getElementById('temperature-chart').getContext('2d');
+  temperatureChart = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      datasets: [{
+        label: 'Température (°C)',
+        borderColor: '#f44336',
+        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+        borderWidth: 2,
+        data: []
+      }]
+    },
+    options: chartOptions
+  });
+  
+  // Initialiser d'autres graphiques de la même manière...
+}
+
+function updateCharts(data) {
+  const timestamp = new Date();
+  
+  // Ajouter de nouvelles données aux graphiques
+  temperatureChart.data.datasets[0].data.push({
+    x: timestamp,
+    y: data.temperature
+  });
+  
+  // Limiter les points de données à afficher (garder les 20 derniers points)
+  if (temperatureChart.data.datasets[0].data.length > 20) {
+    temperatureChart.data.datasets[0].data.shift();
+  }
+  
+  temperatureChart.update();
+  
+  // Mettre à jour d'autres graphiques de la même manière...
+}
+
+// assets/js/auth.js
+function login(email, password) {
+  return fetch('/api/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ email, password })
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Échec de connexion');
+    }
+    return response.json();
+  })
+  .then(data => {
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+    window.location.href = '/dashboard.html';
+  })
+  .catch(error => {
+    console.error('Erreur de connexion:', error);
+    document.getElementById('login-error').textContent = error.message;
+  });
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+  window.location.href = '/index.html';
+}
+
+function checkAuth() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = '/login.html';
+  }
+  return token;
+}
